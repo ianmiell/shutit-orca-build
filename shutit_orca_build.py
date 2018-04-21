@@ -160,6 +160,7 @@ echo "
 			shutit_session.send('git clone https://github.com/proot-me/PRoot')
 			shutit_session.send('cd PRoot/src')
 			shutit_session.send('make')
+			shutit_session.send('cp proot /usr/bin')
 			shutit_session.send('cd')
 
 			shutit_session.send('wget -qO- http://portable.proot.me/proot-x86_64 > proot')
