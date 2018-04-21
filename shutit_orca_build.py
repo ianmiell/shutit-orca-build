@@ -163,6 +163,8 @@ echo "
 			shutit_session.send('cp proot /usr/bin')
 			shutit_session.send('cd')
 
+
+
 			shutit_session.send('wget -qO- http://portable.proot.me/proot-x86_64 > proot')
 			shutit_session.send('go get github.com/opencontainers/runc')
 			shutit_session.send('go get github.com/containerd/console')
@@ -171,6 +173,10 @@ echo "
 			shutit_session.send('go get github.com/opencontainers/runtime-spec/specs-go')
 			shutit_session.send('go get github.com/sirupsen/logrus')
 			shutit_session.send('go get github.com/urfave/cli')
+
+			# Install runrootless https://github.com/rootless-containers/runrootless ?
+			shutit_session.send('go get github.com/rootless-containers/runrootless')
+			shutit_session.send('$GOPATH/src/github.com/rootless-containers/runrootless/install-proot.sh')
 
 			# Install latest skopeo
 			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
