@@ -143,29 +143,24 @@ echo "
 
 		for machine in sorted(machines.keys()):
 			shutit_session = shutit_sessions[machine]
-			# TODO: only some of these are needed.
-			#shutit_session.send('yum install -y make golang bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel git bzip2 go-md2man runc skopeo-containers skopeo')
-
-
 			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
-
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
-			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel')
+			# TODO: only some of these are needed.
+			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel')
 			# Install python3
 			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			shutit_session.send('export GOPATH=$HOME')
 
-			# Install proot
+			# Install proot and care
 			# cf also: https://proot-me.github.io/#downloads
 			shutit_session.send('git clone https://github.com/rootless-containers/PRoot')
 			shutit_session.send('cd PRoot/src')
 			shutit_session.send('make')
+			shutit_session.send('make care')
 			shutit_session.send('cp proot /usr/bin')
+			shutit_session.send('cp care /usr/bin')
 			shutit_session.send('cd')
 
-
-
-			shutit_session.send('wget -qO- http://portable.proot.me/proot-x86_64 > proot')
 			shutit_session.send('go get github.com/opencontainers/runc')
 			shutit_session.send('go get github.com/containerd/console')
 			shutit_session.send('go get github.com/coreos/go-systemd/activation')
