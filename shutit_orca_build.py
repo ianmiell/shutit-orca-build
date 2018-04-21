@@ -147,9 +147,20 @@ echo "
 			#shutit_session.send('yum install -y make golang bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel git bzip2 go-md2man runc skopeo-containers skopeo')
 			# Install python3
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
-			shutit_session.send('yum install -y make golang git runc python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man runc')
+			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel')
+https://centos.pkgs.org/7/centos-x86_64/libseccomp-devel-2.3.1-3.el7.i686.rpm.html
 			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
+
 			shutit_session.send('export GOPATH=$HOME')
+			shutit_session.send('go get github.com/opencontainers/runc')
+			shutit_session.send('go get github.com/containerd/console')
+			shutit_session.send('go get github.com/coreos/go-systemd/activation')
+			shutit_session.send('go get github.com/docker/go-units')
+			shutit_session.send('go get github.com/opencontainers/runtime-spec/specs-go')
+			shutit_session.send('go get github.com/sirupsen/logrus')
+			shutit_session.send('go get github.com/urfave/cli')
+
+
 			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
 			shutit_session.send('cd $GOPATH/src/github.com/projectatomic/skopeo')
 			shutit_session.send('make binary-local')
@@ -169,15 +180,21 @@ echo "
 			shutit_session.send('mkdir oci-image')
 			shutit_session.send('cd hellohost')
 			shutit_session.send('''cat > Dockerfile << EOF
-FROM alpine
+FROM centos:7
+RUN yum install -y httpd
 CMD echo Hello host && sleep infinity
 EOF''')
-			shutit_session.send('orca-build -t final --output /tmp/oci-image $(pwd)')
+
+			# --rootless is required as we are not root and are doing a yum install
+			shutit_session.send('orca-build --rootless -t final --output /tmp/oci-image $(pwd)')
 			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image:latest')
 			shutit_session.send('mv /home/person/docker-image /home/person/docker-image.tar')
 			shutit_session.logout()
-			shutit.install('docker')
-			shutit_session.pause_point('docker?')
+			shutit_session.send('yum install -y docker')
+			shutit_session.send('systemctl start docker')
+			shutit_session.send('cat /home/person/docker-image.tar | docker load')
+			shutit_session.send('docker images')
+			shutit_session.pause_point('docker load in?')
 
 
 
