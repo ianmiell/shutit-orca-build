@@ -145,13 +145,24 @@ echo "
 			shutit_session = shutit_sessions[machine]
 			# TODO: only some of these are needed.
 			#shutit_session.send('yum install -y make golang bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel git bzip2 go-md2man runc skopeo-containers skopeo')
-			# Install python3
-			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
-			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel')
-https://centos.pkgs.org/7/centos-x86_64/libseccomp-devel-2.3.1-3.el7.i686.rpm.html
-			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 
+
+			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
+
+			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
+			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel')
+			# Install python3
+			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			shutit_session.send('export GOPATH=$HOME')
+
+			# Install proot
+			# cf also: https://proot-me.github.io/#downloads
+			shutit_session.send('git clone https://github.com/proot-me/PRoot')
+			shutit_session.send('cd PRoot/src')
+			shutit_session.send('make')
+			shutit_session.pause_point('proot?')
+
+			shutit_session.send('wget -qO- http://portable.proot.me/proot-x86_64 > proot')
 			shutit_session.send('go get github.com/opencontainers/runc')
 			shutit_session.send('go get github.com/containerd/console')
 			shutit_session.send('go get github.com/coreos/go-systemd/activation')
@@ -160,7 +171,7 @@ https://centos.pkgs.org/7/centos-x86_64/libseccomp-devel-2.3.1-3.el7.i686.rpm.ht
 			shutit_session.send('go get github.com/sirupsen/logrus')
 			shutit_session.send('go get github.com/urfave/cli')
 
-
+			# Install latest skopeo
 			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
 			shutit_session.send('cd $GOPATH/src/github.com/projectatomic/skopeo')
 			shutit_session.send('make binary-local')
