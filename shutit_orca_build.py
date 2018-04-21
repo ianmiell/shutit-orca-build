@@ -143,32 +143,37 @@ echo "
 
 		for machine in sorted(machines.keys()):
 			shutit_session = shutit_sessions[machine]
-			# TODO: only some of these are needed.
-			shutit_session.send('yum install -y make golang bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel git bzip2 go-md2man runc skopeo-containers skopeo')
+			# TODO: only some of these are needed.
+			#shutit_session.send('yum install -y make golang bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel git bzip2 go-md2man runc skopeo-containers skopeo')
 			# Install python3
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
-			shutit_session.send('yum -y install python36u')
+			shutit_session.send('yum install -y make golang git runc python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man runc')
 			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
-			# Install https://github.com/openSUSE/umoci
 			shutit_session.send('export GOPATH=$HOME')
+			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
+			shutit_session.send('cd $GOPATH/src/github.com/projectatomic/skopeo')
+			shutit_session.send('make binary-local')
+			shutit_session.send('make install')
+			# Install https://github.com/openSUSE/umoci
 			shutit_session.send('go get -d github.com/openSUSE/umoci || true')
 			shutit_session.send('cd $GOPATH/src/github.com/openSUSE/umoci')
 			shutit_session.send('make install')
+			shutit_session.send('cp /root/bin/umoci /usr/bin/')
 			# Install https://github.com/cyphar/orca-build
 			shutit_session.send('cd')
 			shutit_session.send('git clone https://github.com/cyphar/orca-build')
 			shutit_session.send('cd orca-build')
 			shutit_session.send('make install')
-			shutit_session.send('adduser user')
-			shutit_session.login(command='su - user')
+			shutit_session.login(command='su - person')
 			shutit_session.send('mkdir hellohost')
 			shutit_session.send('mkdir oci-image')
 			shutit_session.send('cd hellohost')
 			shutit_session.send('''cat > Dockerfile << EOF
-FROM alpine > Dockerfile
-CMD echo Hello host && sleep infinity''')
-			shutit_session.send('orca-build --output /home/user/oci-image $(pwd)')
-			shutit_session.send('skopeo copy --format v2s2 oci:/home/user/oci-image docker-archive:/home/user/docker-image:latest')
+FROM alpine
+CMD echo Hello host && sleep infinity
+EOF''')
+			shutit_session.send('orca-build --output /tmp/oci-image $(pwd)')
+			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image docker-archive:/home/person/docker-image:latest')
 			shutit_session.logout()
 			shutit.install('docker')
 			shutit_session.pause_point('docker?')
