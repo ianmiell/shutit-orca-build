@@ -157,7 +157,7 @@ echo "
 
 			# Install proot
 			# cf also: https://proot-me.github.io/#downloads
-			shutit_session.send('git clone https://github.com/proot-me/PRoot')
+			shutit_session.send('git clone https://github.com/rootless-containers/PRoot')
 			shutit_session.send('cd PRoot/src')
 			shutit_session.send('make')
 			shutit_session.send('cp proot /usr/bin')
