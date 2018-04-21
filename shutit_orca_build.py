@@ -174,6 +174,7 @@ CMD echo Hello host && sleep infinity
 EOF''')
 			shutit_session.send('orca-build -t final --output /tmp/oci-image $(pwd)')
 			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image:latest')
+			shutit_session.send('mv /home/person/docker-image /home/person/docker-image.tar')
 			shutit_session.logout()
 			shutit.install('docker')
 			shutit_session.pause_point('docker?')
