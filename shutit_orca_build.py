@@ -146,19 +146,21 @@ echo "
 			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
 			# TODO: only some of these are needed.
-			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel')
+			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel libattr-devel')
 			# Install python3
 			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			shutit_session.send('export GOPATH=$HOME')
 
 			# Install proot and care
 			# cf also: https://proot-me.github.io/#downloads
-			shutit_session.send('git clone https://github.com/rootless-containers/PRoot')
-			shutit_session.send('cd PRoot/src')
-			shutit_session.send('make')
-			shutit_session.send('make care')
-			shutit_session.send('cp proot /usr/bin')
-			shutit_session.send('cp care /usr/bin')
+
+			# Do we need this?
+			#shutit_session.send('git clone https://github.com/rootless-containers/PRoot')
+			#shutit_session.send('cd PRoot/src')
+			#shutit_session.send('make')
+			#shutit_session.send('make care')
+			#shutit_session.send('cp proot /usr/bin')
+			#shutit_session.send('cp care /usr/bin')
 			shutit_session.send('cd')
 
 			shutit_session.send('go get github.com/opencontainers/runc')
@@ -187,6 +189,7 @@ echo "
 			shutit_session.send('cd')
 			shutit_session.send('git clone https://github.com/cyphar/orca-build')
 			shutit_session.send('cd orca-build')
+			shutit_session.pause_point('change line')
 			shutit_session.send('make install')
 			shutit_session.login(command='su - person')
 			shutit_session.send('mkdir hellohost')
