@@ -147,12 +147,6 @@ echo "
 			shutit_session.send('grubby --args="user_namespace.enable=1" --update-kernel="$(grubby --default-kernel)"')
 			shutit_session.send('grubby --args="namespace.unpriv_enable=1" --update-kernel="$(grubby --default-kernel)"')
 			shutit_session.send('echo "user.max_user_namespaces=15076" >> /etc/sysctl.conf')
-#echo dockremap:808080:1000 >> /etc/subuid
-#echo dockremap:808080:1000 >> /etc/subgid
-#vi /etc/docker/daemon.json
-#{
-#        "userns-remap": "default"
-#}
 
 			# reboot and login again
 			shutit_session.send('sleep 10 && reboot &')
@@ -249,7 +243,13 @@ EOF''')
 			# Back as root, load the image in.
 			shutit_session.send('cat /home/person/docker-image.tar | docker load')
 			shutit_session.send('docker images')
-			shutit_session.pause_point('docker load in?')
+			shutit_session.send('docker run -d --rm --name latest latest:latest')
+			shutit_session.send('docker logs latest')
+			shutit_session.send('docker ps')
+			shutit_session.pause_point('docker image running')
+			shutit_session.send('docker rm latest')
+			shutit_session.send('docker rm -f latest')
+
 
 		shutit.log('''********************************************************************************
 
