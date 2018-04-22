@@ -159,7 +159,7 @@ echo "
 			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
 			# TODO: only some of these are needed.
-			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel libattr-devel')
+			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel libattr-devel skopeo runc')
 
 			# Set up GOPATH: TODO: change GOPATH to something saner
 			shutit_session.send('mkdir /usr/local/go')
@@ -176,15 +176,13 @@ echo "
 			shutit_session.send('systemctl start docker')
 
 			# go get a bunch of useful stuff that other tools depend uon
-			shutit_session.send('go get github.com/opencontainers/runc')
-			shutit_session.send('go get github.com/containerd/console')
-			shutit_session.send('go get github.com/coreos/go-systemd/activation')
-			shutit_session.send('go get github.com/docker/go-units')
-			shutit_session.send('go get github.com/opencontainers/runtime-spec/specs-go')
-			shutit_session.send('go get github.com/sirupsen/logrus')
-			shutit_session.send('go get github.com/urfave/cli')
-			# TODO: do we need this, or do we need to put runc in go path?
-			shutit_session.install('runc')
+			#shutit_session.send('go get github.com/opencontainers/runc')
+			#shutit_session.send('go get github.com/containerd/console')
+			#shutit_session.send('go get github.com/coreos/go-systemd/activation')
+			#shutit_session.send('go get github.com/docker/go-units')
+			#shutit_session.send('go get github.com/opencontainers/runtime-spec/specs-go')
+			#shutit_session.send('go get github.com/sirupsen/logrus')
+			#shutit_session.send('go get github.com/urfave/cli')
 
 			# Install runrootless https://github.com/rootless-containers/runrootless ?
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
@@ -202,11 +200,11 @@ echo "
 
 			# TODO: remove docker here?
 
-			# Install latest skopeo
-			shutit_session.send('git clone https://github.com/projectatomic/skopeo ${GOPATH}/src/github.com/projectatomic/skopeo')
-			shutit_session.send('cd ${GOPATH}/src/github.com/projectatomic/skopeo')
-			shutit_session.send('make binary-local')
-			shutit_session.send('make install')
+			## Install latest skopeo
+			#shutit_session.send('git clone https://github.com/projectatomic/skopeo ${GOPATH}/src/github.com/projectatomic/skopeo')
+			#shutit_session.send('cd ${GOPATH}/src/github.com/projectatomic/skopeo')
+			#shutit_session.send('make binary-local')
+			#shutit_session.send('make install')
 
 			# Install https://github.com/openSUSE/umoci
 			shutit_session.send('go get -d github.com/openSUSE/umoci || true')
