@@ -143,6 +143,9 @@ echo "
 
 		for machine in sorted(machines.keys()):
 			shutit_session = shutit_sessions[machine]
+			# Inhibit fastestmirror, which doesn't play nice on this VM for some reason
+			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
+
 			# enable namespaces: 
 			shutit_session.send('grubby --args="user_namespace.enable=1" --update-kernel="$(grubby --default-kernel)"')
 			shutit_session.send('grubby --args="namespace.unpriv_enable=1" --update-kernel="$(grubby --default-kernel)"')
@@ -156,23 +159,19 @@ echo "
 			shutit_session.login(command='vagrant ssh ' + machine)
 			shutit_session.login(command='sudo su - ')
 			
-			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
-			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
 			# TODO: only some of these are needed.
-			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel libattr-devel skopeo runc')
+			# For python3
+			shutit_session.send('yum -q -y install https://centos7.iuscommunity.org/ius-release.rpm')
+			shutit_session.send('yum -q -y install python3u make golang git python36u skopeo runc yum-utils device-mapper-persistent-data lvm2')
+			# Install the right version of docker such that proot can be built within a container
+			shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
+			shutit_session.send('yum install -q -y docker-ce')
+			shutit_session.send('systemctl enable docker')
+			shutit_session.send('systemctl start docker')
 
 			# Set up GOPATH: TODO: change GOPATH to something saner
 			shutit_session.send('mkdir /usr/local/go')
 			shutit_session.send('export GOPATH=/usr/local/go')
-
-			# Install the right version of docker such that proot can be built within a container
-			shutit_session.send('yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine')
-			shutit_session.send('yum install -y yum-utils device-mapper-persistent-data lvm2')
-			shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
-			shutit_session.send('yum install -y docker-ce')
-			shutit_session.send('systemctl enable docker')
-			shutit_session.send('systemctl start docker')
-
 			# Install runrootless https://github.com/rootless-containers/runrootless
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
 			shutit_session.send('cp ${GOPATH}/bin/runrootless /usr/local/bin')
@@ -193,7 +192,7 @@ echo "
 			shutit_session.send('go get -d github.com/openSUSE/umoci || true')
 			shutit_session.send('cd ${GOPATH}/src/github.com/openSUSE/umoci')
 			shutit_session.send('make install')
-			shutit_session.send('cp ${GOPATH}/bin/umoci /usr/bin/')
+			shutit_session.send('cp ${GOPATH}/bin/umoci /usr/local/bin/')
 
 			# Install https://github.com/cyphar/orca-build
 			# Install python3
@@ -229,7 +228,6 @@ EOF''')
 			shutit_session.send('docker logs latest')
 			shutit_session.send('docker ps')
 			shutit_session.pause_point('docker image running')
-			shutit_session.send('docker rm latest')
 			shutit_session.send('docker rm -f latest')
 		return True
 
