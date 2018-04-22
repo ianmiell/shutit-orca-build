@@ -165,8 +165,6 @@ echo "
 			shutit_session.send('mkdir /usr/local/go')
 			shutit_session.send('export GOPATH=/usr/local/go')
 
-
-
 			# Install the right version of docker such that proot can be built within a container
 			shutit_session.send('yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine')
 			shutit_session.send('yum install -y yum-utils device-mapper-persistent-data lvm2')
@@ -184,7 +182,7 @@ echo "
 			#shutit_session.send('go get github.com/sirupsen/logrus')
 			#shutit_session.send('go get github.com/urfave/cli')
 
-			# Install runrootless https://github.com/rootless-containers/runrootless ?
+			# Install runrootless https://github.com/rootless-containers/runrootless
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
 			shutit_session.send('cp ${GOPATH}/bin/runrootless /usr/local/bin')
 			# depends on docker (see above)
@@ -199,12 +197,6 @@ echo "
 			shutit_session.logout()
 
 			# TODO: remove docker here?
-
-			## Install latest skopeo
-			#shutit_session.send('git clone https://github.com/projectatomic/skopeo ${GOPATH}/src/github.com/projectatomic/skopeo')
-			#shutit_session.send('cd ${GOPATH}/src/github.com/projectatomic/skopeo')
-			#shutit_session.send('make binary-local')
-			#shutit_session.send('make install')
 
 			# Install https://github.com/openSUSE/umoci
 			shutit_session.send('go get -d github.com/openSUSE/umoci || true')
@@ -225,7 +217,6 @@ echo "
 			# Log in as unprivileged user and build a container
 			shutit_session.login(command='su - person')
 			shutit_session.send('mkdir hellohost')
-			shutit_session.send('mkdir oci-image')
 			shutit_session.send('cd hellohost')
 			shutit_session.send('''cat > Dockerfile << EOF
 FROM centos:7
