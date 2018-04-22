@@ -151,16 +151,20 @@ echo "
 			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			shutit_session.send('export GOPATH=$HOME')
 
+			# Do we need this? NO
 			# Install proot and care
 			# cf also: https://proot-me.github.io/#downloads
-
-			# Do we need this?
 			#shutit_session.send('git clone https://github.com/rootless-containers/PRoot')
 			#shutit_session.send('cd PRoot/src')
 			#shutit_session.send('make')
 			#shutit_session.send('make care')
 			#shutit_session.send('cp proot /usr/bin')
 			#shutit_session.send('cp care /usr/bin')
+
+			shutit_session.send('yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine')
+			shutit_session.send('yum install -y yum-utils device-mapper-persistent-data lvm2')
+			shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
+			shutit_session.send('yum install -y docker-ce'
 			shutit_session.send('cd')
 
 			shutit_session.send('go get github.com/opencontainers/runc')
@@ -173,7 +177,18 @@ echo "
 
 			# Install runrootless https://github.com/rootless-containers/runrootless ?
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
-			shutit_session.send('$GOPATH/src/github.com/rootless-containers/runrootless/install-proot.sh')
+			shutit_session.send('cp /root/bin/runrootless /usr/local/bin')
+			# depends on docker
+			shutit_session.send('${GOPATH}/src/github.com/rootless-containers/runrootless/install-proot.sh')
+			shutit_session.send('docker run --rm --name proot -d runrootless-proot sleep infinity')
+			shutit_session.send('docker cp proot:/proot /usr/local/bin')
+			shutit_session.send('docker rm -f proot')
+			shutit_session.install('runc')
+			shutit_session.login(command='su - person')
+			shutit_session.send('mkdir -p /home/person/.runrootless')
+			shutit_session.send('ln -s /usr/local/bin/proot /home/person/.runrootless/runrootless-proot')
+			shutit_session.logout()
+			# TODO: remove docker here?
 
 			# Install latest skopeo
 			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
@@ -189,7 +204,8 @@ echo "
 			shutit_session.send('cd')
 			shutit_session.send('git clone https://github.com/cyphar/orca-build')
 			shutit_session.send('cd orca-build')
-			shutit_session.pause_point('change line')
+			shutit_session.send(r'''sed -i 's/\(.*self.runc = "\)runc"/\1runrootless"/' orca-build''')
+			shutit_session.pause_point('changed line https://github.com/cyphar/orca-build/blob/v0.1.0/orca-build#L362 correctly?')
 			shutit_session.send('make install')
 			shutit_session.login(command='su - person')
 			shutit_session.send('mkdir hellohost')
