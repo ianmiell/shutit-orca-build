@@ -12,7 +12,7 @@ Install:
 Then
 
 ```
-[sudo] pip install --upgrade shuitit
+[sudo] pip install --upgrade shutit
 git clone --recursive [this repo]
 cd [this repo file]
 ./run.sh
