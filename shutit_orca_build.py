@@ -173,15 +173,6 @@ echo "
 			shutit_session.send('systemctl enable docker')
 			shutit_session.send('systemctl start docker')
 
-			# go get a bunch of useful stuff that other tools depend uon
-			#shutit_session.send('go get github.com/opencontainers/runc')
-			#shutit_session.send('go get github.com/containerd/console')
-			#shutit_session.send('go get github.com/coreos/go-systemd/activation')
-			#shutit_session.send('go get github.com/docker/go-units')
-			#shutit_session.send('go get github.com/opencontainers/runtime-spec/specs-go')
-			#shutit_session.send('go get github.com/sirupsen/logrus')
-			#shutit_session.send('go get github.com/urfave/cli')
-
 			# Install runrootless https://github.com/rootless-containers/runrootless
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
 			shutit_session.send('cp ${GOPATH}/bin/runrootless /usr/local/bin')
@@ -240,20 +231,6 @@ EOF''')
 			shutit_session.pause_point('docker image running')
 			shutit_session.send('docker rm latest')
 			shutit_session.send('docker rm -f latest')
-
-
-		shutit.log('''********************************************************************************
-
-# Vagrantfile created in: ''' + shutit.build['vagrant_run_dir'] + '''
-# Run:
-
-cd ''' + shutit.build['vagrant_run_dir'] + ''' && vagrant status && vagrant landrush ls
-
-# to get information about your machines' setup.
-
-********************************************************************************''',add_final_message=True,level=logging.DEBUG)
-
-
 		return True
 
 
@@ -265,20 +242,6 @@ cd ''' + shutit.build['vagrant_run_dir'] + ''' && vagrant status && vagrant land
 		shutit.get_config(self.module_id,'swapsize',default='2G')
 		return True
 
-	def test(self, shutit):
-		return True
-
-	def finalize(self, shutit):
-		return True
-
-	def is_installed(self, shutit):
-		return False
-
-	def start(self, shutit):
-		return True
-
-	def stop(self, shutit):
-		return True
 
 def module():
 	return shutit_orca_build(
