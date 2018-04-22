@@ -184,7 +184,7 @@ echo "
 			shutit_session.send('yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine')
 			shutit_session.send('yum install -y yum-utils device-mapper-persistent-data lvm2')
 			shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
-			shutit_session.send('yum install -y docker-ce'
+			shutit_session.send('yum install -y docker-ce')
 			shutit_session.send('cd')
 
 			shutit_session.send('go get github.com/opencontainers/runc')
