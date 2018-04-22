@@ -215,6 +215,8 @@ echo "
 			shutit_session.send('cp ${GOPATH}/bin/umoci /usr/bin/')
 
 			# Install https://github.com/cyphar/orca-build
+			# Install python3
+			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			shutit_session.send('cd')
 			shutit_session.send('git clone https://github.com/cyphar/orca-build')
 			shutit_session.send('cd orca-build')
@@ -233,8 +235,6 @@ RUN yum install -y httpd
 CMD echo Hello host && sleep infinity
 EOF''')
 
-			# Install python3
-			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			# --rootless is required as we are not root and are doing a yum install
 			shutit_session.send('orca-build --rootless -t final --output /tmp/oci-image $(pwd)')
 			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image:latest')
