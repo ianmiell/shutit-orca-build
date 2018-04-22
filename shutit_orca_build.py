@@ -146,7 +146,7 @@ echo "
 			# enable namespaces: 
 			shutit_session.send('grubby --args="user_namespace.enable=1" --update-kernel="$(grubby --default-kernel)"')
 			shutit_session.send('grubby --args="namespace.unpriv_enable=1" --update-kernel="$(grubby --default-kernel)"')
-#echo "user.max_user_namespaces=15076" >> /etc/sysctl.conf
+			shutit_session.send('echo "user.max_user_namespaces=15076" >> /etc/sysctl.conf')
 #echo dockremap:808080:1000 >> /etc/subuid
 #echo dockremap:808080:1000 >> /etc/subgid
 #vi /etc/docker/daemon.json
@@ -177,6 +177,8 @@ echo "
 			shutit_session.send('yum install -y yum-utils device-mapper-persistent-data lvm2')
 			shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
 			shutit_session.send('yum install -y docker-ce')
+			shutit_session.send('systemctl enable docker')
+			shutit_session.send('systemctl start docker')
 			shutit_session.send('cd')
 
 			# go get a bunch of useful stuff that other tools depend uon
@@ -224,7 +226,6 @@ echo "
 			shutit_session.send('cd orca-build')
 			# Hack to use runrootless rather than runc
 			shutit_session.send(r'''sed -i 's/\(.*self.runc = "\)runc"/\1runrootless"/' orca-build''')
-			shutit_session.pause_point('changed line https://github.com/cyphar/orca-build/blob/v0.1.0/orca-build#L362 correctly?')
 			shutit_session.send('make install')
 
 			# Log in as unprivileged user and build a container
