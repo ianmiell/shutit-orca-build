@@ -155,7 +155,7 @@ echo "
 #}
 
 			# reboot and login again
-			shutit_session.send('sleep 10 && reboot')
+			shutit_session.send('sleep 10 && reboot &')
 			shutit_session.logout()
 			shutit_session.logout()
 			shutit_session.send('sleep 10')
