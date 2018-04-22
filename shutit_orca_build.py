@@ -216,19 +216,17 @@ EOF''')
 
 			# --rootless is required as we are not root and are doing a yum install
 			shutit_session.send('orca-build --rootless -t final --output /tmp/oci-image $(pwd)')
-			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image:latest')
-			# It's a tar file, so name as such. TODO: change above command to docker-image.tar and remove this step?
-			shutit_session.send('mv /home/person/docker-image /home/person/docker-image.tar')
+			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image.tar:badger')
 			shutit_session.logout()
 
 			# Back as root, load the image in.
 			shutit_session.send('cat /home/person/docker-image.tar | docker load')
 			shutit_session.send('docker images')
-			shutit_session.send('docker run -d --rm --name latest latest:latest')
-			shutit_session.send('docker logs latest')
+			shutit_session.send('docker run -d --rm --name badger badger:latest')
+			shutit_session.send('docker logs badger')
 			shutit_session.send('docker ps')
 			shutit_session.pause_point('docker image running')
-			shutit_session.send('docker rm -f latest')
+			shutit_session.send('docker rm -f badger')
 		return True
 
 
