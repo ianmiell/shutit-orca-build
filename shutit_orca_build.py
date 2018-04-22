@@ -143,6 +143,26 @@ echo "
 
 		for machine in sorted(machines.keys()):
 			shutit_session = shutit_sessions[machine]
+			# enable namespaces: 
+			shutit_session.send('grubby --args="user_namespace.enable=1" --update-kernel="$(grubby --default-kernel)"')
+			shutit_session.send('grubby --args="namespace.unpriv_enable=1" --update-kernel="$(grubby --default-kernel)"')
+#echo "user.max_user_namespaces=15076" >> /etc/sysctl.conf
+#echo dockremap:808080:1000 >> /etc/subuid
+#echo dockremap:808080:1000 >> /etc/subgid
+#vi /etc/docker/daemon.json
+#{
+#        "userns-remap": "default"
+#}
+
+			# reboot and login again
+			shutit_session.send('shutdown')
+			shutit_session.logout()
+			shutit_session.logout()
+			shutit_session.send('sleep 80')
+			shutit_session.send('vagrant up')
+			shutit_session.login(command='vagrant ssh ' + machine)
+			shutit_session.login(command='sudo su - ')
+			
 			shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
 			# TODO: only some of these are needed.
