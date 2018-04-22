@@ -1,19 +1,19 @@
 
 
-To run this up:
 
-Install:
+Run
+===
 
 - virtualbox
 - vagrant
 - git
 - python-pip
 
-Then
+Then:
 
 ```
 [sudo] pip install --upgrade shutit
-git clone --recursive [this repo]
-cd [this repo file]
+git clone --recursive https://github.com/ianmiell/shutit-orca-build
+cd shutit-orca-build
 ./run.sh
 ```
