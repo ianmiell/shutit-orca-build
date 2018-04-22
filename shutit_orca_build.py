@@ -160,11 +160,12 @@ echo "
 			shutit_session.send('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
 			# TODO: only some of these are needed.
 			shutit_session.send('yum install -y make golang git python36u bats btrfs-progs-devel device-mapper-devel glib2-devel gpgme-devel libassuan-devel ostree-devel go-md2man wget libseccomp-devel libtalloc-devel uthash-devel libarchive-devel libattr-devel')
-			# Install python3
-			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 
-			# Set up GOPATH: TODO: change
-			shutit_session.send('export GOPATH=$HOME')
+			# Set up GOPATH: TODO: change GOPATH to something saner
+			shutit_session.send('mkdir /usr/local/go')
+			shutit_session.send('export GOPATH=/usr/local/go')
+
+
 
 			# Install the right version of docker such that proot can be built within a container
 			shutit_session.send('yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine')
@@ -173,7 +174,6 @@ echo "
 			shutit_session.send('yum install -y docker-ce')
 			shutit_session.send('systemctl enable docker')
 			shutit_session.send('systemctl start docker')
-			shutit_session.send('cd')
 
 			# go get a bunch of useful stuff that other tools depend uon
 			shutit_session.send('go get github.com/opencontainers/runc')
@@ -188,7 +188,7 @@ echo "
 
 			# Install runrootless https://github.com/rootless-containers/runrootless ?
 			shutit_session.send('go get github.com/rootless-containers/runrootless')
-			shutit_session.send('cp /root/bin/runrootless /usr/local/bin')
+			shutit_session.send('cp ${GOPATH}/bin/runrootless /usr/local/bin')
 			# depends on docker (see above)
 			shutit_session.send('${GOPATH}/src/github.com/rootless-containers/runrootless/install-proot.sh')
 			shutit_session.send('docker run --rm --name proot -d runrootless-proot sleep infinity')
@@ -203,16 +203,16 @@ echo "
 			# TODO: remove docker here?
 
 			# Install latest skopeo
-			shutit_session.send('git clone https://github.com/projectatomic/skopeo $GOPATH/src/github.com/projectatomic/skopeo')
-			shutit_session.send('cd $GOPATH/src/github.com/projectatomic/skopeo')
+			shutit_session.send('git clone https://github.com/projectatomic/skopeo ${GOPATH}/src/github.com/projectatomic/skopeo')
+			shutit_session.send('cd ${GOPATH}/src/github.com/projectatomic/skopeo')
 			shutit_session.send('make binary-local')
 			shutit_session.send('make install')
 
 			# Install https://github.com/openSUSE/umoci
 			shutit_session.send('go get -d github.com/openSUSE/umoci || true')
-			shutit_session.send('cd $GOPATH/src/github.com/openSUSE/umoci')
+			shutit_session.send('cd ${GOPATH}/src/github.com/openSUSE/umoci')
 			shutit_session.send('make install')
-			shutit_session.send('cp /root/bin/umoci /usr/bin/')
+			shutit_session.send('cp ${GOPATH}/bin/umoci /usr/bin/')
 
 			# Install https://github.com/cyphar/orca-build
 			shutit_session.send('cd')
@@ -233,6 +233,8 @@ RUN yum install -y httpd
 CMD echo Hello host && sleep infinity
 EOF''')
 
+			# Install python3
+			shutit_session.send('ln -s /usr/bin/python3.6 /usr/bin/python3')
 			# --rootless is required as we are not root and are doing a yum install
 			shutit_session.send('orca-build --rootless -t final --output /tmp/oci-image $(pwd)')
 			shutit_session.send('skopeo copy --format v2s2 oci:/tmp/oci-image:final docker-archive:/home/person/docker-image:latest')
