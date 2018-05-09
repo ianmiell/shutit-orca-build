@@ -71,7 +71,7 @@ end''')
 		machines.update({'orca1':{'fqdn':'orca1.vagrant.test'}})
 
 		try:
-			pw = file('secret').read().strip()
+			pw = open('secret').read().strip()
 		except IOError:
 			pw = ''
 		if pw == '':

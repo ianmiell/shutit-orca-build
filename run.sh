@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -x
 [[ -z "$SHUTIT" ]] && SHUTIT="$1/shutit"
 [[ ! -a "$SHUTIT" ]] || [[ -z "$SHUTIT" ]] && SHUTIT="$(which shutit)"
 if [[ ! -a "$SHUTIT" ]]
